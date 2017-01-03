@@ -17,7 +17,7 @@ var ddlName = 'ddl.sql'
 
 var initDb = function(name) {
     var path = __dirname + '/' + dataFolder + '/' + dbName
-
+    
     createFileIfNotExist(path, function() {
         db = new sqlite.Database(path)
 
@@ -29,16 +29,29 @@ var initDb = function(name) {
 }
 
 var createFileIfNotExist = function(path, next) {
-    if (!fs.exists(path)) {
-        fs.writeFile(path, "", function(err) {
-            if (err) {
-                console.log(err)
-                throw err
-            }
-        });
+    fs.access(path, fs.constants.R_OK, (err) => {
+        if (err !== undefined) {
+            console.log('DB file does not exist')
+            createEmptyFile(path, next)
+            return
+        }
 
         next()
-    }
+    })
+}
+
+var createEmptyFile = function(path, next) {
+    fs.writeFile(path, "", (err) => {
+        if (err) {
+            console.error(err)
+            throw err
+        }
+
+        console.log("Created empty file in " + path)
+
+        if (next !== undefined)
+            next()
+    })
 }
 
 var getInstance = function() {
@@ -56,7 +69,7 @@ var dbIsEmpty = function(path) {
     if (isEmpty)
         console.log("Database is empty")
 
-    return stats["size"] < 100
+    return isEmpty
 }
 
 var createDbStructure = function(handle) {
