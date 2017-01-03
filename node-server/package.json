@@ -8,6 +8,8 @@
   },
   "devDependencies": {
     "@types/node": "^6.0.52",
-    "typescript": "^2.1.4"
+    "typescript": "^2.1.4",
+    "tsc": "^1.20150623.0",
+    "typings": "^2.1.0"
   }
 }
