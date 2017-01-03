@@ -2,9 +2,10 @@ var sqlite = require('sqlite3')
 var fs = require('fs')
 
 module.exports = {
-    getQueue: function(count) {
-        var db = getInstance()
-        return 'Test'
+    getQueue: function(count, callback) {
+        getInstance(function(db) {
+            callback(undefined, "Yay!")
+        })
     }
 }
 
@@ -15,14 +16,25 @@ var dbName = 'db.sqlite'
 var assetsFolder = '../assets'
 var ddlName = 'ddl.sql'
 
-var initDb = function(name) {
+var getInstance = function(next) {
+    if (db === undefined) {
+        initDb(dbName, function() {
+            next(db)
+        })
+        return
+    }
+
+    next(db);
+}
+
+var initDb = function(name, next) {
     var path = __dirname + '/' + dataFolder + '/' + dbName
-    
+
     createFileIfNotExist(path, function() {
         db = new sqlite.Database(path)
 
         if (dbIsEmpty(path)) {
-            createDbStructure(db);
+            createDbStructure(db, next);
         }
     })
     
@@ -54,14 +66,6 @@ var createEmptyFile = function(path, next) {
     })
 }
 
-var getInstance = function() {
-    if (db === undefined) {
-        initDb(dbName)
-    }
-
-    return db;
-}
-
 var dbIsEmpty = function(path) {
     var stats = fs.statSync(path)
     var isEmpty = stats["size"] < 100
@@ -72,7 +76,7 @@ var dbIsEmpty = function(path) {
     return isEmpty
 }
 
-var createDbStructure = function(handle) {
+var createDbStructure = function(handle, callback) {
     var path = __dirname + '/' + assetsFolder + '/' + ddlName
 
     console.log("Creating database from ddl " + path)
@@ -83,5 +87,7 @@ var createDbStructure = function(handle) {
         }
         handle.exec(data.toString())
         console.log("New database created")
+
+        callback()
     })
 }

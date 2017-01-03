@@ -11,7 +11,9 @@ app.get('/queue', function (req, res) {
 })
 
 app.get('/pop', function(req, res) {
-  res.end(datasource.pop())
+  datasource.pop((err, data) => {
+    res.end(data)
+  })
 })
 
 var server = app.listen(8081, function () {

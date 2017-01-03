@@ -1,12 +1,12 @@
 var db = require('./sqlitedriver')
 
 module.exports = {
-    pop: function() {
-        console.log('Pop')
-        return getQueue(1);
+    pop: function(callback) {
+        console.log('Pop invoked')
+        getQueue(1, callback)
     }
 }
 
-var getQueue = function(count) {
-    return db.getQueue(count);
+var getQueue = function(count, callback) {
+    db.getQueue(count, callback)
 }
